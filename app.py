@@ -1,6 +1,7 @@
 from Clipboard import Clipboard
+import keyboard
 
 
 Clipboard()
 
-input("")
+keyboard.wait()

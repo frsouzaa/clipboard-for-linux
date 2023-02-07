@@ -10,23 +10,30 @@ class Clipboard():
     def __init__(self) -> None:
         self.history = []
         self.startListener()
-        self.display()
 
 
     def startListener(self) -> None:
         keyboard.add_hotkey("ctrl + c", self.formatarBuffer)
+        keyboard.add_hotkey("alt + n", self.display)
     
 
     def formatarBuffer(self) -> None:
-        self.history.append(popen("xsel -o").read())
-        print(self.history)
+        string = popen("xsel -o").read()
+        if not string:
+            return
+        if len(self.history) > 1 and string == self.history[-1]:
+            return
+        self.history.append(string)
 
     
     def display(self) -> None:
+        if not self.history:
+            return
+
         sg.theme('DarkGray13')
 
         textColumn = [
-            [sg.InputText(default_text="teste", size=(20,20))]
+            [sg.Multiline(default_text=string, size=(40,self.getRows(string)), pad=(8,8), no_scrollbar=True)] for string in self.history[::-1]
         ]
 
         layout = [
@@ -35,5 +42,14 @@ class Clipboard():
             ]
         ]
 
-        self.window = sg.Window(title="Clipboard for Linux", layout=layout, margins=(100,100))
-        self.window.read()
+        self.window = sg.Window(title="Clipboard for Linux", layout=layout, margins=(10,10))
+
+        while True:
+            event, values = self.window.read()
+            if event in (None, 'Exit', 'Cancel'): 
+                break
+        self.window.close()
+
+    
+    def getRows(self, string: str) -> int:
+        return string.count("\n")+1
