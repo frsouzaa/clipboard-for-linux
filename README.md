@@ -1,4 +1,4 @@
-# Clipboard For Linux
+### Clipboard For Linux
 
 To run the project just runs:
 - sudo ./latest\ release/app
